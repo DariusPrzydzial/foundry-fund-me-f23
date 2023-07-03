@@ -12,7 +12,7 @@ contract FundMeTest is StdCheats, Test {
     FundMe public fundMe;
     HelperConfig public helperConfig;
 
-    uint256 public constant SEND_VALUE = 0.1 ether; // just a value to make sure we are sending enough!
+    uint256 public constant SEND_VALUE = .1 ether; // just a value to make sure we are sending enough!
     uint256 public constant STARTING_USER_BALANCE = 10 ether;
     uint256 public constant GAS_PRICE = 1;
 
@@ -77,15 +77,17 @@ contract FundMeTest is StdCheats, Test {
         uint256 startingFundMeBalance = address(fundMe).balance;
         uint256 startingOwnerBalance = fundMe.getOwner().balance;
 
-        // vm.txGasPrice(GAS_PRICE);
-        // uint256 gasStart = gasleft();
-        // // Act
+        vm.txGasPrice(GAS_PRICE);
+        uint256 gasStart = gasleft();
+
+        // Act
         vm.startPrank(fundMe.getOwner());
         fundMe.withdraw();
         vm.stopPrank();
 
-        // uint256 gasEnd = gasleft();
-        // uint256 gasUsed = (gasStart - gasEnd) * tx.gasprice;
+        uint256 gasEnd = gasleft();
+        uint256 gasUsed = (gasStart - gasEnd) * tx.gasprice;
+        // console.log(gasUsed);
 
         // Assert
         uint256 endingFundMeBalance = address(fundMe).balance;
@@ -93,7 +95,7 @@ contract FundMeTest is StdCheats, Test {
         assertEq(endingFundMeBalance, 0);
         assertEq(
             startingFundMeBalance + startingOwnerBalance,
-            endingOwnerBalance // + gasUsed
+            endingOwnerBalance //+ gasUsed
         );
     }
 
